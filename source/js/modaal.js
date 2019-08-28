@@ -85,6 +85,7 @@
 
 	var modaal_loading_spinner = '<div class="modaal-loading-spinner"><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div></div>'
 	
+  var watch_event_histories = [];
 	var Modaal = {
 		init : function(options, elem) {
 			var self = this;
@@ -196,6 +197,7 @@
 			}
 
 			// call events to be watched (click, tab, keyup, keydown etc.)
+      watch_event_histories.push(self); // remember child modal event instance
 			self.watch_events();
 		},
 
@@ -992,6 +994,14 @@
 				// scope is now closed
 				self.scope.is_open = false;
 
+				// restore child modaal events
+        var index = watch_event_histories.indexOf(self)
+        if(index > -1){
+          watch_event_histories.splice(index, 1);
+          if(watch_event_histories.length){
+            watch_event_histories[watch_event_histories.length-1].watch_events();
+          }
+        }
 			}, self.options.after_callback_delay);
 
 			// Call overlay hide
